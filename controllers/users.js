@@ -3,9 +3,9 @@ const User = require("../models/users");
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
-    res.send(users);
+    return res.send(users);
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    return res.status(500).send({ message: err.message });
   }
 };
 
@@ -15,9 +15,9 @@ const getUser = async (req, res) => {
     if (!user) {
       return res.status(404).send({ message: "User not found" });
     }
-    res.send(user);
+    return res.send(user);
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    return res.status(500).send({ message: err.message });
   }
 };
 
@@ -25,9 +25,9 @@ const createUser = async (req, res) => {
   try {
     const { name, avatar } = req.body;
     const user = await User.create({ name, avatar });
-    res.status(201).send(user);
+    return res.status(201).send(user);
   } catch (err) {
-    res.status(400).send({ message: err.message });
+    return res.status(400).send({ message: err.message });
   }
 };
 

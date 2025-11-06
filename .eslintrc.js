@@ -26,5 +26,6 @@ module.exports = {
         allow: ["_id"],
       },
     ],
+    "no-console": "off",
   },
 };
