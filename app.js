@@ -27,6 +27,18 @@ app.use((req, res) => {
   res.status(404).send({ message: "Requested resource not found" });
 });
 
+// Global error handler
+app.use((err, req, res) => {
+  if (err && err.name === "CastError" && err.kind === "ObjectId") {
+    return res.status(400).send({ message: "Invalid id" });
+  }
+
+  console.error(err);
+  return res.status(err.statusCode || 500).send({
+    message: err.message || "Internal Server Error",
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
