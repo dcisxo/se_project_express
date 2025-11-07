@@ -28,9 +28,7 @@ const createItem = async (req, res) => {
 
 const deleteItem = async (req, res) => {
   try {
-    const item = await ClothingItem.findByIdAndDelete(
-      req.params.itemId
-    ).orFail();
+    await ClothingItem.findByIdAndDelete(req.params.itemId).orFail();
     return res.send({ message: "Item deleted successfully" });
   } catch (err) {
     console.error(err);
