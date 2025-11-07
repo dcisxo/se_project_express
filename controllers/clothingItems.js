@@ -1,11 +1,13 @@
 const ClothingItem = require("../models/clothingItems");
+const { ERROR_400, ERROR_404, ERROR_500 } = require("../utils/errors");
 
 const getItems = async (req, res) => {
   try {
     const items = await ClothingItem.find({});
     return res.send(items);
   } catch (err) {
-    return res.status(500).send({ message: err.message });
+    console.error(err);
+    return res.status(ERROR_500).send({ message: err.message });
   }
 };
 
@@ -16,25 +18,29 @@ const createItem = async (req, res) => {
     const item = await ClothingItem.create({ name, weather, imageUrl, owner });
     return res.status(201).send(item);
   } catch (err) {
+    console.error(err);
     if (err.name === "ValidationError") {
-      return res.status(400).send({ message: err.message });
+      return res.status(ERROR_400).send({ message: err.message });
     }
-    return res.status(400).send({ message: err.message });
+    return res.status(ERROR_500).send({ message: err.message });
   }
 };
 
 const deleteItem = async (req, res) => {
   try {
-    const item = await ClothingItem.findByIdAndDelete(req.params.itemId);
-    if (!item) {
-      return res.status(404).send({ message: "Item not found" });
-    }
+    const item = await ClothingItem.findByIdAndDelete(
+      req.params.itemId
+    ).orFail();
     return res.send({ message: "Item deleted successfully" });
   } catch (err) {
-    if (err.name === "CastError") {
-      return res.status(400).send({ message: "Invalid item ID" });
+    console.error(err);
+    if (err.name === "DocumentNotFoundError") {
+      return res.status(ERROR_404).send({ message: "Item not found" });
     }
-    return res.status(500).send({ message: err.message });
+    if (err.name === "CastError") {
+      return res.status(ERROR_400).send({ message: "Invalid item ID" });
+    }
+    return res.status(ERROR_500).send({ message: err.message });
   }
 };
 
@@ -44,16 +50,17 @@ const likeItem = async (req, res) => {
       req.params.itemId,
       { $addToSet: { likes: req.user._id } },
       { new: true }
-    );
-    if (!item) {
-      return res.status(404).send({ message: "Item not found" });
-    }
+    ).orFail();
     return res.send(item);
   } catch (err) {
-    if (err.name === "CastError") {
-      return res.status(400).send({ message: "Invalid item ID" });
+    console.error(err);
+    if (err.name === "DocumentNotFoundError") {
+      return res.status(ERROR_404).send({ message: "Item not found" });
     }
-    return res.status(500).send({ message: err.message });
+    if (err.name === "CastError") {
+      return res.status(ERROR_400).send({ message: "Invalid item ID" });
+    }
+    return res.status(ERROR_500).send({ message: err.message });
   }
 };
 
@@ -63,16 +70,17 @@ const dislikeItem = async (req, res) => {
       req.params.itemId,
       { $pull: { likes: req.user._id } },
       { new: true }
-    );
-    if (!item) {
-      return res.status(404).send({ message: "Item not found" });
-    }
+    ).orFail();
     return res.send(item);
   } catch (err) {
-    if (err.name === "CastError") {
-      return res.status(400).send({ message: "Invalid item ID" });
+    console.error(err);
+    if (err.name === "DocumentNotFoundError") {
+      return res.status(ERROR_404).send({ message: "Item not found" });
     }
-    return res.status(500).send({ message: err.message });
+    if (err.name === "CastError") {
+      return res.status(ERROR_400).send({ message: "Invalid item ID" });
+    }
+    return res.status(ERROR_500).send({ message: err.message });
   }
 };
 

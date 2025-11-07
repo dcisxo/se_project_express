@@ -1,26 +1,29 @@
 const User = require("../models/users");
+const { ERROR_400, ERROR_404, ERROR_500 } = require("../utils/errors");
 
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
     return res.send(users);
   } catch (err) {
-    return res.status(500).send({ message: err.message });
+    console.error(err);
+    return res.status(ERROR_500).send({ message: err.message });
   }
 };
 
 const getUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId);
-    if (!user) {
-      return res.status(404).send({ message: "User not found" });
-    }
+    const user = await User.findById(req.params.userId).orFail();
     return res.send(user);
   } catch (err) {
-    if (err.name === "CastError") {
-      return res.status(400).send({ message: "Invalid user ID" });
+    console.error(err);
+    if (err.name === "DocumentNotFoundError") {
+      return res.status(ERROR_404).send({ message: "User not found" });
     }
-    return res.status(500).send({ message: err.message });
+    if (err.name === "CastError") {
+      return res.status(ERROR_400).send({ message: "Invalid user ID" });
+    }
+    return res.status(ERROR_500).send({ message: err.message });
   }
 };
 
@@ -30,7 +33,13 @@ const createUser = async (req, res) => {
     const user = await User.create({ name, avatar });
     return res.status(201).send(user);
   } catch (err) {
-    return res.status(400).send({ message: err.message });
+    console.error(err);
+    if (err.name === "ValidationError") {
+      return res.status(ERROR_400).send({ message: err.message });
+    }
+    return res
+      .status(ERROR_500)
+      .send({ message: "An error occurred on the server" });
   }
 };
 

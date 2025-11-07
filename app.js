@@ -11,7 +11,7 @@ app.use(express.json());
 // Temporary middleware to set a default user (remove this later when you add authentication)
 app.use((req, res, next) => {
   req.user = {
-    _id: "507f1f77bcf86cd799439011", // replace with a valid user ID from your database
+    _id: "690e73961b205cacc1369140",
   };
   next();
 });
