@@ -7,7 +7,9 @@ const getUsers = async (req, res) => {
     return res.send(users);
   } catch (err) {
     console.error(err);
-    return res.status(ERROR_500).send({ message: err.message });
+    return res
+      .status(ERROR_500)
+      .send({ message: "An error has occurred on the server" });
   }
 };
 
@@ -23,7 +25,9 @@ const getUser = async (req, res) => {
     if (err.name === "CastError") {
       return res.status(ERROR_400).send({ message: "Invalid user ID" });
     }
-    return res.status(ERROR_500).send({ message: err.message });
+    return res
+      .status(ERROR_500)
+      .send({ message: "An error has occurred on the server" });
   }
 };
 

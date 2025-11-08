@@ -7,7 +7,9 @@ const getItems = async (req, res) => {
     return res.send(items);
   } catch (err) {
     console.error(err);
-    return res.status(ERROR_500).send({ message: err.message });
+    return res
+      .status(ERROR_500)
+      .send({ message: "An error has occurred on the server" });
   }
 };
 
@@ -22,7 +24,9 @@ const createItem = async (req, res) => {
     if (err.name === "ValidationError") {
       return res.status(ERROR_400).send({ message: err.message });
     }
-    return res.status(ERROR_500).send({ message: err.message });
+    return res
+      .status(ERROR_500)
+      .send({ message: "An error has occurred on the server" });
   }
 };
 
@@ -38,7 +42,9 @@ const deleteItem = async (req, res) => {
     if (err.name === "CastError") {
       return res.status(ERROR_400).send({ message: "Invalid item ID" });
     }
-    return res.status(ERROR_500).send({ message: err.message });
+    return res
+      .status(ERROR_500)
+      .send({ message: "An error has occurred on the server" });
   }
 };
 
@@ -58,7 +64,9 @@ const likeItem = async (req, res) => {
     if (err.name === "CastError") {
       return res.status(ERROR_400).send({ message: "Invalid item ID" });
     }
-    return res.status(ERROR_500).send({ message: err.message });
+    return res
+      .status(ERROR_500)
+      .send({ message: "An error has occurred on the server" });
   }
 };
 
@@ -78,7 +86,9 @@ const dislikeItem = async (req, res) => {
     if (err.name === "CastError") {
       return res.status(ERROR_400).send({ message: "Invalid item ID" });
     }
-    return res.status(ERROR_500).send({ message: err.message });
+    return res
+      .status(ERROR_500)
+      .send({ message: "An error has occurred on the server" });
   }
 };
 

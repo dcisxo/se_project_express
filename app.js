@@ -28,7 +28,7 @@ app.use((req, res) => {
 });
 
 // Global error handler
-app.use((err, req, res) => {
+app.use((err, req, res, _next) => {
   if (err && err.name === "CastError" && err.kind === "ObjectId") {
     return res.status(400).send({ message: "Invalid id" });
   }
