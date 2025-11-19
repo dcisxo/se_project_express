@@ -13,6 +13,14 @@ mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 
 app.use(express.json());
 
+// Temporary middleware to set a default user (remove this later when you add authentication)
+app.use((req, res, next) => {
+  req.user = {
+    _id: "690e73961b205cacc1369140",
+  };
+  next();
+});
+
 // Public routes (no auth required)
 app.post("/signin", login);
 app.post("/signup", createUser);
