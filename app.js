@@ -1,27 +1,26 @@
 const express = require("express");
-
-const app = express();
 const mongoose = require("mongoose");
 
+const app = express();
 const { PORT = 3001 } = process.env;
+
+const auth = require("./middlewares/auth");
+const { createUser, login } = require("./controllers/users");
+const clothingItemsRouter = require("./routes/clothingsItems");
+const usersRouter = require("./routes/users");
 
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 
 app.use(express.json());
-// Temporary middleware to set a default user (remove this later when you add authentication)
-app.use((req, res, next) => {
-  req.user = {
-    _id: "690e73961b205cacc1369140",
-  };
-  next();
-});
+app.use(auth);
 
-// Import and use routes
-const clothingItemsRouter = require("./routes/clothingsItems");
-const usersRouter = require("./routes/users");
+// Public routes (no auth required)
+app.post("/signin", login);
+app.post("/signup", createUser);
 
-app.use("/items", clothingItemsRouter);
-app.use("/users", usersRouter);
+// Protected routes (auth required)
+app.use("/items", auth, clothingItemsRouter);
+app.use("/users", auth, usersRouter);
 
 app.use((req, res) => {
   res.status(404).send({ message: "Requested resource not found" });
