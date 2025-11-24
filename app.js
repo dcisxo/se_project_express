@@ -30,8 +30,10 @@ app.post("/signup", createUser);
 app.get("/items", getItems);
 
 // Protected routes (auth required)
-app.use("/items", auth, clothingItemsRouter);
 app.use("/users", auth, usersRouter);
+
+// Apply auth middleware to specific item routes instead of globally
+app.use("/items", clothingItemsRouter);
 
 app.use((req, res) => {
   res.status(404).send({ message: "Requested resource not found" });
