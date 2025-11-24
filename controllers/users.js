@@ -44,12 +44,23 @@ const createUser = async (req, res) => {
       email,
       password: hashedPassword,
     });
-    return res.status(201).send(user);
+
+    // Hide password from response
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    return res.status(201).send(userResponse);
   } catch (err) {
     console.error(err);
+
+    if (err.code === 11000) {
+      return res.status(ERROR_409).send({ message: "Email already exists" });
+    }
+
     if (err.name === "ValidationError") {
       return res.status(ERROR_400).send({ message: err.message });
     }
+
     return res
       .status(ERROR_500)
       .send({ message: "An error occurred on the server" });
@@ -63,7 +74,7 @@ const login = async (req, res) => {
 
     // we're creating a token
     const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-      expiresIn: 3600,
+      expiresIn: "7d",
     });
 
     // we return the token

@@ -32,7 +32,13 @@ const createItem = async (req, res) => {
 
 const deleteItem = async (req, res) => {
   try {
-    await ClothingItem.findByIdAndDelete(req.params.itemId).orFail();
+    const item = await ClothingItem.findById(req.params.itemId).orFail();
+    if (item.owner.toString() !== req.user._id) {
+      return res
+        .status(ERROR_403)
+        .send({ message: "You are not authorized to delete this item" });
+    }
+    await item.deleteOne();
     return res.send({ message: "Item deleted successfully" });
   } catch (err) {
     console.error(err);
