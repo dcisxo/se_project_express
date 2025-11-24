@@ -1,7 +1,12 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/users");
-const { ERROR_400, ERROR_404, ERROR_500 } = require("../utils/errors");
+const {
+  ERROR_400,
+  ERROR_404,
+  ERROR_409,
+  ERROR_500,
+} = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 
 const getUsers = async (req, res) => {

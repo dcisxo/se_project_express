@@ -1,5 +1,10 @@
 const ClothingItem = require("../models/clothingItems");
-const { ERROR_400, ERROR_404, ERROR_500 } = require("../utils/errors");
+const {
+  ERROR_400,
+  ERROR_403,
+  ERROR_404,
+  ERROR_500,
+} = require("../utils/errors");
 
 const getItems = async (req, res) => {
   try {
