@@ -9,25 +9,23 @@ const auth = require("./middlewares/auth");
 const { createUser, login } = require("./controllers/users");
 const clothingItemsRouter = require("./routes/clothingsItems");
 const usersRouter = require("./routes/users");
-const { getItems } = require("./controllers/clothingItems");
 
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 
 app.use(cors());
 app.use(express.json());
 
-// Temporary authorization solution for testing
-app.use((req, res, next) => {
-  req.user = {
-    _id: "690e73961b205cacc1369140",
-  };
-  next();
-});
+// // Temporary authorization solution for testing
+// app.use((req, res, next) => {
+//   req.user = {
+//     _id: "690e73961b205cacc1369140",
+//   };
+//   next();
+// });
 
 // Public routes (no auth required)
 app.post("/signin", login);
 app.post("/signup", createUser);
-app.get("/items", getItems);
 
 // Protected routes (auth required)
 app.use("/users", auth, usersRouter);
