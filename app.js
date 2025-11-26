@@ -9,8 +9,16 @@ const auth = require("./middlewares/auth");
 const { createUser, login } = require("./controllers/users");
 const clothingItemsRouter = require("./routes/clothingsItems");
 const usersRouter = require("./routes/users");
+const User = require("./models/users");
 
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
+
+// Ensure indexes are created
+mongoose.connection.on("connected", async () => {
+  console.log("Connected to MongoDB");
+  await User.init(); // This ensures all indexes are created
+  console.log("Indexes created");
+});
 
 app.use(cors());
 app.use(express.json());
