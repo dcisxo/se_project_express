@@ -54,7 +54,7 @@ const createUser = async (req, res) => {
     const userResponse = user.toObject();
     delete userResponse.password;
 
-    return res.status(201).send(userResponse);
+    return res.status(201).send({ data: userResponse });
   } catch (err) {
     console.error(err);
 
@@ -85,7 +85,7 @@ const login = async (req, res) => {
     // we return the token
     res.send({ token });
   } catch (err) {
-    res.status(401).send({ message: err.message });
+    res.status(400).send({ message: err.message });
   }
 };
 

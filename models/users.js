@@ -30,16 +30,19 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 8,
-    select: false, // Exclude password field by default
+    select: false,
   },
 });
+
+// Ensure indexes are created
+userSchema.index({ email: 1 }, { unique: true });
 
 userSchema.statics.findUserByCredentials = function findUserByCredentials(
   email,
   password
 ) {
   return this.findOne({ email })
-    .select("+password") // Include password field for authentication
+    .select("+password")
     .then((user) => {
       if (!user) {
         return Promise.reject(new Error("Invalid email or password"));
