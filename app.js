@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const { ERROR_400, ERROR_404, ERROR_500 } = require("./utils/errors");
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -42,17 +43,17 @@ app.use("/users", auth, usersRouter);
 app.use("/items", clothingItemsRouter);
 
 app.use((req, res) => {
-  res.status(404).send({ message: "Requested resource not found" });
+  res.status(ERROR_404).send({ message: "Requested resource not found" });
 });
 
 // Global error handler
 app.use((err, req, res, _next) => {
   if (err && err.name === "CastError" && err.kind === "ObjectId") {
-    return res.status(400).send({ message: "Invalid id" });
+    return res.status(ERROR_400).send({ message: "Invalid id" });
   }
 
   console.error(err);
-  return res.status(err.statusCode || 500).send({
+  return res.status(err.statusCode || ERROR_500).send({
     message: err.message || "Internal Server Error",
   });
 });

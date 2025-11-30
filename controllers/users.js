@@ -42,6 +42,14 @@ const getUser = async (req, res) => {
 const createUser = async (req, res) => {
   try {
     const { name, avatar, email, password } = req.body;
+
+    // Validate that email and password are present
+    if (!email || !password) {
+      return res.status(ERROR_400).send({
+        message: "Email and password are required",
+      });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
       name,
@@ -75,6 +83,14 @@ const createUser = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // Validate that email and password are present
+    if (!email || !password) {
+      return res.status(ERROR_400).send({
+        message: "Email and password are required",
+      });
+    }
+
     const user = await User.findUserByCredentials(email, password);
 
     // we're creating a token
@@ -85,7 +101,17 @@ const login = async (req, res) => {
     // we return the token
     res.send({ token });
   } catch (err) {
-    res.status(400).send({ message: err.message });
+    console.error(err);
+
+    // Authentication failure (invalid credentials)
+    if (err.message === "Incorrect email or password") {
+      return res.status(401).send({ message: "Incorrect email or password" });
+    }
+
+    // Unexpected server errors
+    return res
+      .status(ERROR_500)
+      .send({ message: "An error has occurred on the server" });
   }
 };
 
@@ -97,6 +123,9 @@ const getCurrentUser = async (req, res) => {
     console.error(err);
     if (err.name === "DocumentNotFoundError") {
       return res.status(ERROR_404).send({ message: "User not found" });
+    }
+    if (err.name === "CastError") {
+      return res.status(ERROR_400).send({ message: "Invalid user ID" });
     }
     return res
       .status(ERROR_500)
