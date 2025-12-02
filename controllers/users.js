@@ -99,7 +99,7 @@ const login = async (req, res) => {
     });
 
     // we return the token
-    res.send({ token });
+    return res.send({ token });
   } catch (err) {
     console.error(err);
 
