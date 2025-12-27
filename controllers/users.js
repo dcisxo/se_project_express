@@ -58,11 +58,16 @@ const createUser = async (req, res) => {
       password: hashedPassword,
     });
 
+    // Generate token for the new user
+    const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
     // Hide password from response
     const userResponse = user.toObject();
     delete userResponse.password;
 
-    return res.status(201).send({ data: userResponse });
+    return res.status(201).send({ token, data: userResponse });
   } catch (err) {
     console.error(err);
 
