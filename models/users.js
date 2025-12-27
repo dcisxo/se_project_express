@@ -34,9 +34,6 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// Ensure indexes are created
-userSchema.index({ email: 1 }, { unique: true });
-
 userSchema.statics.findUserByCredentials = function findUserByCredentials(
   email,
   password

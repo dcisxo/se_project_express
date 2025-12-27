@@ -43,7 +43,6 @@ const createUser = async (req, res) => {
   try {
     const { name, avatar, email, password } = req.body;
 
-    // Validate that email and password are present
     if (!email || !password) {
       return res.status(ERROR_400).send({
         message: "Email and password are required",
@@ -51,6 +50,7 @@ const createUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await User.create({
       name,
       avatar,
@@ -58,16 +58,14 @@ const createUser = async (req, res) => {
       password: hashedPassword,
     });
 
-    // Generate token for the new user
     const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
       expiresIn: "7d",
     });
 
-    // Hide password from response
     const userResponse = user.toObject();
     delete userResponse.password;
 
-    return res.status(201).send({ token, data: userResponse });
+    return res.status(201).send({ token, user: userResponse });
   } catch (err) {
     console.error(err);
 
@@ -89,7 +87,6 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate that email and password are present
     if (!email || !password) {
       return res.status(ERROR_400).send({
         message: "Email and password are required",
@@ -98,22 +95,18 @@ const login = async (req, res) => {
 
     const user = await User.findUserByCredentials(email, password);
 
-    // we're creating a token
     const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
       expiresIn: "7d",
     });
 
-    // we return the token
     return res.send({ token });
   } catch (err) {
     console.error(err);
 
-    // Authentication failure (invalid credentials)
     if (err.message === "Incorrect email or password") {
       return res.status(401).send({ message: "Incorrect email or password" });
     }
 
-    // Unexpected server errors
     return res
       .status(ERROR_500)
       .send({ message: "An error has occurred on the server" });

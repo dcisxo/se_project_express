@@ -7,47 +7,32 @@ const app = express();
 const { PORT = 3001 } = process.env;
 
 const auth = require("./middlewares/auth");
-const { createUser, login } = require("./controllers/users");
+const authRouter = require("./routes/auth");
 const clothingItemsRouter = require("./routes/clothingsItems");
 const usersRouter = require("./routes/users");
 const User = require("./models/users");
 
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 
-// Ensure indexes are created
-mongoose.connection.on("connected", async () => {
-  console.log("Connected to MongoDB");
-  await User.init(); // This ensures all indexes are created
-  console.log("Indexes created");
-});
-
 app.use(cors());
 app.use(express.json());
 
-// // Temporary authorization solution for testing
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: "690e73961b205cacc1369140",
-//   };
-//   next();
-// });
-
 // Public routes (no auth required)
-app.post("/signin", login);
-app.post("/signup", createUser);
+app.use("/", authRouter);
+
+// Items routes (some protected, some public)
+app.use("/items", clothingItemsRouter);
 
 // Protected routes (auth required)
 app.use("/users", auth, usersRouter);
 
-// Apply auth middleware to specific item routes instead of globally
-app.use("/items", clothingItemsRouter);
-
-app.use((req, res) => {
+// 404 handler
+app.use((req, res, next) => {
   res.status(ERROR_404).send({ message: "Requested resource not found" });
 });
 
-// Global error handler
-app.use((err, req, res, _next) => {
+// Global error handler - MUST have 4 parameters (err, req, res, next)
+app.use((err, req, res, next) => {
   if (err && err.name === "CastError" && err.kind === "ObjectId") {
     return res.status(ERROR_400).send({ message: "Invalid id" });
   }
