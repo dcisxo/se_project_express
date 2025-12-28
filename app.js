@@ -10,7 +10,6 @@ const auth = require("./middlewares/auth");
 const authRouter = require("./routes/auth");
 const clothingItemsRouter = require("./routes/clothingsItems");
 const usersRouter = require("./routes/users");
-const User = require("./models/users");
 
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 
@@ -27,12 +26,12 @@ app.use("/items", clothingItemsRouter);
 app.use("/users", auth, usersRouter);
 
 // 404 handler
-app.use((req, res, next) => {
+app.use((res) => {
   res.status(ERROR_404).send({ message: "Requested resource not found" });
 });
 
 // Global error handler - MUST have 4 parameters (err, req, res, next)
-app.use((err, req, res, next) => {
+app.use((err, res) => {
   if (err && err.name === "CastError" && err.kind === "ObjectId") {
     return res.status(ERROR_400).send({ message: "Invalid id" });
   }
