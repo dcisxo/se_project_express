@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const { ERROR_400, ERROR_404, ERROR_500 } = require("./utils/errors");
+const { errors } = require("celebrate");
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -25,6 +25,8 @@ app.use("/items", clothingItemsRouter);
 
 // Protected routes (auth required)
 app.use("/users", auth, usersRouter);
+
+app.use(errors());
 
 app.use(errorHandler);
 
