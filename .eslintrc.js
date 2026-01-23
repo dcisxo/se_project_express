@@ -24,6 +24,7 @@ module.exports = {
       "error",
       {
         allow: ["_id"],
+        argsIgnorePattern: "next",
       },
     ],
     "no-console": "off",
