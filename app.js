@@ -10,7 +10,7 @@ const { requestLogger, errorLogger } = require("./middlewares/logger");
 const errorHandler = require("./middlewares/errorHandler");
 const auth = require("./middlewares/auth");
 const authRouter = require("./routes/auth");
-const clothingItemsRouter = require("./routes/clothingsItems");
+const clothingItemsRouter = require("./routes/clothingItems");
 const usersRouter = require("./routes/users");
 
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
