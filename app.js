@@ -7,7 +7,7 @@ const app = express();
 const { PORT = 3001 } = process.env;
 
 const { requestLogger, errorLogger } = require("./middlewares/logger");
-const errorHandler = require("./middlewares/errorHandler");
+const { notFoundHandler, errorHandler } = require("./middlewares/errorHandler");
 const auth = require("./middlewares/auth");
 const authRouter = require("./routes/auth");
 const clothingItemsRouter = require("./routes/clothingItems");
@@ -33,6 +33,7 @@ app.use(errorLogger);
 
 app.use(errors());
 
+app.use(notFoundHandler);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
