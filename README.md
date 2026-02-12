@@ -6,7 +6,7 @@ The back-end project is focused on creating a server for the WTWR application. Y
 
 - **Backend API**: [https://www.globalwear.h-o-s-t.name](https://www.globalwear.h-o-s-t.name)
 - **Frontend Repository**: [https://github.com/your-username/se_project_react](https://github.com/your-username/se_project_react)
-- **Project Pitch Video**: [https://www.loom.com/share/02dba6e7cb4c4952ac744840fc0d24de](https://www.loom.com/share/02dba6e7cb4c4952ac744840fc0d24de)
+- **Project Pitch Video**: [https://www.loom.com/share/d472ee9765b04f45bc0d2c9c2bebe466](https://www.loom.com/share/d472ee9765b04f45bc0d2c9c2bebe466)
 
 ## Technologies and Techniques Used
 
