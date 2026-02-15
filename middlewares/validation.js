@@ -1,5 +1,6 @@
 const { celebrate, Joi } = require("celebrate");
 const validator = require("validator");
+const mongoose = require("mongoose");
 
 const validateURL = (value, helpers) => {
   if (validator.isURL(value)) {
@@ -8,7 +9,14 @@ const validateURL = (value, helpers) => {
   return helpers.error("string.uri");
 };
 
-module.exports.validateUser = celebrate({
+const validateId = (value, helpers) => {
+  if (mongoose.Types.ObjectId.isValid(value)) {
+    return value;
+  }
+  return helpers.message("Invalid ID");
+};
+
+module.exports.validateUserBody = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     avatar: Joi.string().required().custom(validateURL),
@@ -16,8 +24,8 @@ module.exports.validateUser = celebrate({
     password: Joi.string()
       .required()
       .min(8)
-      .max(128) // Prevent DoS
-      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/) // At least one lowercase, uppercase, and digit
+      .max(128)
+      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
       .message(
         "Password must contain at least one uppercase letter, one lowercase letter, and one number"
       ),
@@ -36,26 +44,23 @@ module.exports.validateUserUpdate = celebrate({
   }),
 });
 
-module.exports.validateLogin = celebrate({
+module.exports.validateAuthentication = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string()
       .required()
       .min(8)
-      .max(128) // Prevent DoS
-      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/) // At least one lowercase, uppercase, and digit
+      .max(128)
+      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
       .message(
         "Password must contain at least one uppercase letter, one lowercase letter, and one number"
       ),
   }),
 });
 
-module.exports.validateUserId = celebrate({
+module.exports.validateId = celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().required().hex().length(24).messages({
-      "string.length": 'The "userId" must be 24 characters long',
-      "string.hex": 'The "userId" must be a hexadecimal string',
-    }),
+    id: Joi.string().required().custom(validateId),
   }),
 });
 

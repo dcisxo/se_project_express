@@ -8,11 +8,8 @@ const app = express();
 const { PORT = 3001 } = process.env;
 
 const { requestLogger, errorLogger } = require("./middlewares/logger");
-const { notFoundHandler, errorHandler } = require("./middlewares/errorHandler");
-const auth = require("./middlewares/auth");
-const authRouter = require("./routes/auth");
-const clothingItemsRouter = require("./routes/clothingItems");
-const usersRouter = require("./routes/users");
+const { errorHandler } = require("./middlewares/errorHandler");
+const routes = require("./routes");
 
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 
@@ -22,19 +19,12 @@ app.use(express.json());
 app.use(requestLogger);
 
 // Public routes (no auth required)
-app.use("/", authRouter);
-
-// Items routes (some protected, some public)
-app.use("/items", clothingItemsRouter);
-
-// Protected routes (auth required)
-app.use("/users", auth, usersRouter);
+app.use("/", routes);
 
 app.use(errorLogger);
 
 app.use(errors());
 
-app.use(notFoundHandler);
 app.use(errorHandler);
 
 app.listen(PORT, () => {

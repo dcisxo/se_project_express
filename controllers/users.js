@@ -21,21 +21,12 @@ const getUsers = async (req, res) => {
   }
 };
 
-const getUser = async (req, res) => {
+const getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.userId).orFail();
     return res.send(user);
   } catch (err) {
-    console.error(err);
-    if (err.name === "DocumentNotFoundError") {
-      return res.status(ERROR_404).send({ message: "User not found" });
-    }
-    if (err.name === "CastError") {
-      return res.status(ERROR_400).send({ message: "Invalid user ID" });
-    }
-    return res
-      .status(ERROR_500)
-      .send({ message: "An error has occurred on the server" });
+    next(err);
   }
 };
 

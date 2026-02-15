@@ -24,10 +24,9 @@ module.exports = {
       "error",
       {
         allow: ["_id"],
-        argsIgnorePattern: "next",
       },
     ],
     "no-console": "off",
-    "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+    "no-unused-vars": ["error", { argsIgnorePattern: "next|^_" }],
   },
 };
