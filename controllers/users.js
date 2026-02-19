@@ -26,47 +26,38 @@ const getUser = async (req, res, next) => {
     const user = await User.findById(req.params.userId).orFail();
     return res.send(user);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
 const createUser = async (req, res) => {
+  const { name, avatar, email, password } = req.body;
+
+  if (!email || !password) {
+    return res
+      .status(ERROR_400)
+      .send({ message: "Email and password are required" });
+  }
+
   try {
-    const { name, avatar, email, password } = req.body;
+    const hash = await bcrypt.hash(password, 10);
+    const user = await User.create({ name, avatar, email, password: hash });
 
-    if (!email || !password) {
-      return res.status(ERROR_400).send({
-        message: "Email and password are required",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await User.create({
-      name,
-      avatar,
-      email,
-      password: hashedPassword,
+    return res.status(201).send({
+      name: user.name,
+      avatar: user.avatar,
+      email: user.email,
+      _id: user._id,
     });
-
-    const userResponse = user.toObject();
-    delete userResponse.password;
-
-    return res.status(201).send({ user: userResponse });
   } catch (err) {
     console.error(err);
-
     if (err.code === 11000) {
       return res.status(ERROR_409).send({ message: "Email already exists" });
     }
-
     if (err.name === "ValidationError") {
       return res.status(ERROR_400).send({ message: err.message });
     }
-
-    return res
-      .status(ERROR_500)
-      .send({ message: "An error occurred on the server" });
+    return res.status(ERROR_500).send({ message: "Server error" });
   }
 };
 
