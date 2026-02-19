@@ -18,14 +18,13 @@ const validateId = (value, helpers) => {
 
 module.exports.validateUserBody = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    avatar: Joi.string().required().custom(validateURL),
+    name: Joi.string().min(2).max(30),
+    avatar: Joi.string().custom(validateURL),
     email: Joi.string().required().email(),
     password: Joi.string()
       .required()
       .min(8)
       .max(128)
-      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
       .message(
         "Password must contain at least one uppercase letter, one lowercase letter, and one number"
       ),
