@@ -9,7 +9,7 @@ const validateURL = (value, helpers) => {
   return helpers.error("string.uri");
 };
 
-const validateId = (value, helpers) => {
+const validateObjectId = (value, helpers) => {
   if (mongoose.Types.ObjectId.isValid(value)) {
     return value;
   }
@@ -50,7 +50,6 @@ module.exports.validateAuthentication = celebrate({
       .required()
       .min(8)
       .max(128)
-      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
       .message(
         "Password must contain at least one uppercase letter, one lowercase letter, and one number"
       ),
@@ -59,7 +58,7 @@ module.exports.validateAuthentication = celebrate({
 
 module.exports.validateId = celebrate({
   params: Joi.object().keys({
-    id: Joi.string().required().custom(validateId),
+    itemId: Joi.string().required().custom(validateObjectId),
   }),
 });
 
@@ -74,8 +73,9 @@ module.exports.validateClothingItem = celebrate({
       "string.empty": 'The "imageUrl" field must be filled in',
       "string.uri": 'the "imageUrl" field must be a valid url',
     }),
-    weather: Joi.string().valid("hot", "warm", "cold").messages({
+    weather: Joi.string().required().valid("hot", "warm", "cold").messages({
       "any.only": 'The "weather" field must be one of "hot", "warm", or "cold"',
+      "string.empty": 'The "weather" field must be filled in',
     }),
   }),
 });
