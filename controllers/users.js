@@ -1,23 +1,18 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/users");
-const {
-  ERROR_400,
-  ERROR_404,
-  ERROR_409,
-  ERROR_500,
-} = require("../utils/errors");
+const BadRequestError = require("../errors/BadRequestError");
+const UnauthorizedError = require("../errors/UnauthorizedError");
+const NotFoundError = require("../errors/NotFoundError");
+const ConflictError = require("../errors/ConflictError");
 const { JWT_SECRET } = require("../utils/config");
 
-const getUsers = async (req, res) => {
+const getUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
     return res.send(users);
   } catch (err) {
-    console.error(err);
-    return res
-      .status(ERROR_500)
-      .send({ message: "An error has occurred on the server" });
+    return next(err);
   }
 };
 
@@ -26,17 +21,21 @@ const getUser = async (req, res, next) => {
     const user = await User.findById(req.params.userId).orFail();
     return res.send(user);
   } catch (err) {
+    if (err.name === "DocumentNotFoundError") {
+      return next(new NotFoundError("User not found"));
+    }
+    if (err.name === "CastError") {
+      return next(new BadRequestError("Invalid user ID"));
+    }
     return next(err);
   }
 };
 
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
   if (!email || !password) {
-    return res
-      .status(ERROR_400)
-      .send({ message: "Email and password are required" });
+    return next(new BadRequestError("Email and password are required"));
   }
 
   try {
@@ -50,25 +49,22 @@ const createUser = async (req, res) => {
       _id: user._id,
     });
   } catch (err) {
-    console.error(err);
     if (err.code === 11000) {
-      return res.status(ERROR_409).send({ message: "Email already exists" });
+      return next(new ConflictError("Email already exists"));
     }
     if (err.name === "ValidationError") {
-      return res.status(ERROR_400).send({ message: err.message });
+      return next(new BadRequestError(err.message));
     }
-    return res.status(ERROR_500).send({ message: "Server error" });
+    return next(err);
   }
 };
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(ERROR_400).send({
-        message: "Email and password are required",
-      });
+      return next(new BadRequestError("Email and password are required"));
     }
 
     const user = await User.findUserByCredentials(email, password);
@@ -79,37 +75,29 @@ const login = async (req, res) => {
 
     return res.send({ token });
   } catch (err) {
-    console.error(err);
-
     if (err.message === "Incorrect email or password") {
-      return res.status(401).send({ message: "Incorrect email or password" });
+      return next(new UnauthorizedError("Incorrect email or password"));
     }
-
-    return res
-      .status(ERROR_500)
-      .send({ message: "An error has occurred on the server" });
+    return next(err);
   }
 };
 
-const getCurrentUser = async (req, res) => {
+const getCurrentUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id).orFail();
     return res.send(user);
   } catch (err) {
-    console.error(err);
     if (err.name === "DocumentNotFoundError") {
-      return res.status(ERROR_404).send({ message: "User not found" });
+      return next(new NotFoundError("User not found"));
     }
     if (err.name === "CastError") {
-      return res.status(ERROR_400).send({ message: "Invalid user ID" });
+      return next(new BadRequestError("Invalid user ID"));
     }
-    return res
-      .status(ERROR_500)
-      .send({ message: "An error has occurred on the server" });
+    return next(err);
   }
 };
 
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
   try {
     const { name, avatar } = req.body;
     const user = await User.findByIdAndUpdate(
@@ -119,16 +107,13 @@ const updateUser = async (req, res) => {
     ).orFail();
     return res.send(user);
   } catch (err) {
-    console.error(err);
     if (err.name === "DocumentNotFoundError") {
-      return res.status(ERROR_404).send({ message: "User not found" });
+      return next(new NotFoundError("User not found"));
     }
     if (err.name === "ValidationError") {
-      return res.status(ERROR_400).send({ message: err.message });
+      return next(new BadRequestError(err.message));
     }
-    return res
-      .status(ERROR_500)
-      .send({ message: "An error has occurred on the server" });
+    return next(err);
   }
 };
 
